@@ -1,23 +1,20 @@
-/* Import General Sans from Fontshare */
-@import url("https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap");
-
-/* Reset default margins and paddings */
+/* Apply text-wrap: balance to all elements */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  text-wrap: balance;
 }
 
 /* Apply General Sans as the default font */
 body {
-  font-family: "General Sans", sans-serif;
+  font-family: 'GeneralSans', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   color: #333;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-wrap: balance;
 }
 
 /* Header styling - Positioned at the top-left */
