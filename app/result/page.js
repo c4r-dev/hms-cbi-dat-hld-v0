@@ -54,8 +54,29 @@ function ResultContent() {
     fetchData();
   }, [dataString]);
 
-  const handleSubmit = () => {
-    setSubmitted(true);
+  const handleSubmit = async () => {
+    const predictionData = {
+      predicted_performance: predictedPerformance,
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      const response = await fetch("/api/savePrediction", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(predictionData),
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+      } else {
+        console.error("Failed to save prediction");
+      }
+    } catch (error) {
+      console.error("Error submitting prediction:", error);
+    }
   };
 
   return (
@@ -90,9 +111,6 @@ function ResultContent() {
           step={1}
           marks={[
             { value: 0, label: "0" },
-            { value: 25, label: "25" },
-            { value: 50, label: "50" },
-            { value: 75, label: "75" },
             { value: 100, label: "100" },
           ]}
           sx={{ color: "#9932cc" }}
