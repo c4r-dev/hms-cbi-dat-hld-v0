@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { Box, Checkbox, Typography, Button } from "@mui/material";
-import Grid from "@mui/material/Grid2"; // Correct Grid2 import
 
 export default function Home() {
   const [datasets, setDatasets] = useState({
@@ -38,47 +37,72 @@ export default function Home() {
   };
 
   return (
-    <Box sx={{ p: 4, textAlign: "center", mt: 12, position: "relative" }}>
+    <Box sx={{ p: 4, textAlign: "center", mt: 12 }}>
       <Typography variant="h4" gutterBottom sx={{ textWrap: "balance" }}>
         Select subsets of the data to be used for training and testing the model
       </Typography>
 
-      <Box sx={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", height: "auto" }}>
-        {/* Training Section (Far Left) */}
-        <Box className="training-container">
-          <Typography mb={1} variant="h6" sx={{ textWrap: "balance" }}>Training</Typography>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "1fr auto 1fr",
+          alignItems: "center",
+          gap: 2,
+          mt: 4,
+        }}
+      >
+        {/* Training Section */}
+        <Box className="training-container" sx={{ textAlign: "center" }}>
+          <Typography mb={1} variant="h6" sx={{ textWrap: "balance" }}>
+            Training
+          </Typography>
           <Box className="tube">
-            <Box className="tube-fill training-fill" sx={{ height: calculateFill("training") }} />
+            <Box
+              className="tube-fill training-fill"
+              sx={{ height: calculateFill("training") }}
+            />
           </Box>
         </Box>
 
-        {/* Dataset Selection (Center) */}
-        <Box className="dataset-section">
-          <Typography variant="h6" mb={2} sx={{ textWrap: "balance" }}>Data Subsets</Typography>
+        {/* Dataset Section */}
+        <Box className="dataset-section" sx={{ textAlign: "center" }}>
+          <Typography variant="h6" mb={2} sx={{ textWrap: "balance" }}>
+            Data Subsets
+          </Typography>
           {Object.keys(datasets).map((dataset, index) => (
-            <Box key={dataset} className="subset-container">
-              <Checkbox checked={datasets[dataset].training} onChange={() => handleChange(dataset, "training")} />
+            <Box key={dataset} className="subset-container" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Checkbox
+                checked={datasets[dataset].training}
+                onChange={() => handleChange(dataset, "training")}
+              />
               <Box className="subset-box">{index + 1}</Box>
-              <Checkbox checked={datasets[dataset].testing} onChange={() => handleChange(dataset, "testing")} />
+              <Checkbox
+                checked={datasets[dataset].testing}
+                onChange={() => handleChange(dataset, "testing")}
+              />
             </Box>
           ))}
-          
-          {/* Run Model Button */}
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             className="run-model-button"
             onClick={handleRunModel}
             disabled={isButtonDisabled()}
+            sx={{ mt: 4 }}
           >
             Run Model
           </Button>
         </Box>
 
-        {/* Testing Section (Far Right) */}
-        <Box className="testing-container">
-          <Typography mb={1} variant="h6" sx={{ textWrap: "balance" }}>Testing</Typography>
+        {/* Testing Section */}
+        <Box className="testing-container" sx={{ textAlign: "center" }}>
+          <Typography mb={1} variant="h6" sx={{ textWrap: "balance" }}>
+            Testing
+          </Typography>
           <Box className="tube">
-            <Box className="tube-fill testing-fill" sx={{ height: calculateFill("testing") }} />
+            <Box
+              className="tube-fill testing-fill"
+              sx={{ height: calculateFill("testing") }}
+            />
           </Box>
         </Box>
       </Box>

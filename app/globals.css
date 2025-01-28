@@ -68,26 +68,13 @@ label {
   align-items: flex-end;
 }
 
-/* Move Training farther to the left, overlapping Data Subsets */
-.training-container {
-  position: absolute;
-  left: 300px; /* Move it farther left */
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Move Testing farther to the right, overlapping Data Subsets */
+/* Training and Testing containers aligned in a row */
+.training-container,
 .testing-container {
-  position: absolute;
-  right: 300px; /* Move it farther right */
-  top: 50%;
-  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
 /* Liquid Fill */
@@ -136,8 +123,6 @@ label {
 
 /* Centered Dataset Section */
 .dataset-section {
-  position: relative;
-  z-index: 2;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -146,7 +131,7 @@ label {
 
 /* Move Data Subsets Section Further Down */
 .dataset-section {
-  margin-top: 120px; /* Increased margin for more space below */
+  margin-top: 40px;
 }
 
 /* Improved Run Model Button Spacing */
@@ -156,7 +141,7 @@ label {
   font-size: 16px;
   font-weight: bold;
   padding: 12px 24px;
-  margin-top: 80px; /* Extra space before button */
+  margin-top: 40px;
   border-radius: 6px;
   text-transform: none;
   transition: background 0.3s ease-in-out;
@@ -172,6 +157,15 @@ label {
   background-color: #cccccc !important;
   color: #666666 !important;
   cursor: not-allowed;
+}
+
+/* Grid Layout to align Training, Data Subsets, and Testing */
+.model-selection-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 20px;
+  margin-top: 40px;
 }
 
 /* Responsive Adjustments */
@@ -198,19 +192,16 @@ label {
   }
 
   /* Adjustments for small screens */
-  .training-container {
-    left: -120px; /* Adjust positioning for smaller screens */
-  }
-
-  .testing-container {
-    right: -120px; /* Adjust positioning for smaller screens */
+  .model-selection-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
   }
 
   .dataset-section {
-    margin-top: 100px; /* Moves it even further down for mobile */
+    margin-top: 30px;
   }
 
   .run-model-button {
-    margin-top: 60px; /* Adjusted for smaller screens */
+    margin-top: 30px;
   }
 }
