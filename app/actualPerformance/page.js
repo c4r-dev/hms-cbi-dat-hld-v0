@@ -23,10 +23,16 @@ function ActualPerformanceContent() {
   const errorValue = predictedValue - actualValue; // Difference between guess and actual
   const actualReference = 0; // Actual Model Performance is set at 0
 
+  // Ensure errorValue stays within -30 to 30 range to prevent Chart.js crashes
+  const limitedErrorValue = Math.max(-30, Math.min(30, errorValue));
+
   // Create dataset for thin vertical lines at "Your Guess" and "Actual Model Performance"
   const createVerticalLineDataset = (xValue, color) => ({
     label: "",
-    data: [{ x: xValue, y: 0 }, { x: xValue, y: 1 }],
+    data: [
+      { x: xValue, y: 0 },
+      { x: xValue, y: 1 },
+    ],
     borderColor: color,
     borderWidth: 2,
     pointRadius: 0,
@@ -36,7 +42,7 @@ function ActualPerformanceContent() {
   const chartData = {
     datasets: [
       createVerticalLineDataset(actualReference, "#29D1C4"), // Actual Performance at 0
-      createVerticalLineDataset(errorValue, "orange"), // Error estimation (Your Guess - Actual)
+      createVerticalLineDataset(limitedErrorValue, "orange"), // Your Guess - Actual
     ],
   };
 
@@ -144,10 +150,3 @@ function ActualPerformanceContent() {
   );
 }
 
-export default function ActualPerformance() {
-  return (
-    <Suspense fallback={<Box sx={{ textAlign: "center", mt: 12 }}><CircularProgress /></Box>}>
-      <ActualPerformanceContent />
-    </Suspense>
-  );
-}
