@@ -1,16 +1,17 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import { Box, Typography, CircularProgress, Slider, Button } from "@mui/material";
 
 function ResultContent() {
   const searchParams = useSearchParams();
   const dataString = searchParams.get("data");
+  const router = useRouter();
 
   const [testPerformance, setTestPerformance] = useState(null);
   const [predictedPerformance, setPredictedPerformance] = useState(50);
-  const [submitted, setSubmitted] = useState(false);
+  const [outOfSamplePerformance, setOutOfSamplePerformance] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,7 +22,7 @@ function ResultContent() {
         const jsonData = await response.json();
         const selectedData = JSON.parse(dataString);
 
-        // Convert the selected dataset into a filter criteria
+        // Convert selected dataset into filter criteria
         const filterCriteria = {
           training_1: selectedData.dataset1.training ? 1 : 0,
           training_2: selectedData.dataset2.training ? 1 : 0,
@@ -40,11 +41,13 @@ function ResultContent() {
           )
         );
 
-        // Convert test_performance to a percentage (2 decimal places)
-        if (matchedObject?.test_performance !== undefined) {
+        // Extract test_performance and out_of_sample_performance
+        if (matchedObject) {
           setTestPerformance((matchedObject.test_performance * 100).toFixed(2) + "%");
+          setOutOfSamplePerformance((matchedObject.out_of_sample_performance * 100).toFixed(2));
         } else {
           setTestPerformance("No results found");
+          setOutOfSamplePerformance(null);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -54,28 +57,11 @@ function ResultContent() {
     fetchData();
   }, [dataString]);
 
-  const handleSubmit = async () => {
-    const predictionData = {
-      predicted_performance: predictedPerformance,
-      timestamp: new Date().toISOString(),
-    };
-
-    try {
-      const response = await fetch("/api/savePrediction", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(predictionData),
-      });
-
-      if (response.ok) {
-        setSubmitted(true);
-      } else {
-        console.error("Failed to save prediction");
-      }
-    } catch (error) {
-      console.error("Error submitting prediction:", error);
+  const handleSubmit = () => {
+    if (outOfSamplePerformance !== null) {
+      router.push(
+        `/actualPerformance?predicted=${predictedPerformance}&actual=${outOfSamplePerformance}`
+      );
     }
   };
 
@@ -134,17 +120,11 @@ function ResultContent() {
             "&:hover": { backgroundColor: "#800080" },
           }}
           onClick={handleSubmit}
+          disabled={outOfSamplePerformance === null}
         >
           Submit Prediction
         </Button>
       </Box>
-
-      {/* Submission Confirmation */}
-      {submitted && (
-        <Typography variant="h6" sx={{ mt: 3, color: "green" }}>
-          Prediction Submitted: {predictedPerformance}%
-        </Typography>
-      )}
     </Box>
   );
 }
