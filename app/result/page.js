@@ -1,10 +1,10 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { useEffect, useState, Suspense } from "react";
+import { Box, Typography, CircularProgress } from "@mui/material";
 
-export default function ResultPage() {
+function ResultContent() {
   const searchParams = useSearchParams();
   const dataString = searchParams.get("data");
 
@@ -66,8 +66,16 @@ export default function ResultPage() {
           </Box>
         )
       ) : (
-        <Typography>Loading...</Typography>
+        <CircularProgress />
       )}
     </Box>
+  );
+}
+
+export default function ResultPage() {
+  return (
+    <Suspense fallback={<Box sx={{ textAlign: "center", mt: 12 }}><CircularProgress /></Box>}>
+      <ResultContent />
+    </Suspense>
   );
 }
