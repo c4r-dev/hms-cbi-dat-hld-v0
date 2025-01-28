@@ -129,32 +129,32 @@ label {
   margin-top: 120px; /* Increased margin for more space below */
 }
 
-/* Run Model Button */
+/* Improved Run Model Button Spacing */
 .run-model-button {
-  background-color: #9932cc  !important; /* Purple */
+  background-color: #9932cc !important;
   color: white !important;
   font-size: 16px;
   font-weight: bold;
-  padding: 10px 20px;
-  margin-top: 70px; /* Increased margin for more space above */
-  border-radius: 5px;
+  padding: 12px 24px;
+  margin-top: 80px; /* Extra space before button */
+  border-radius: 6px;
   text-transform: none;
   transition: background 0.3s ease-in-out;
 }
 
 /* Hover effect */
 .run-model-button:hover {
-  background-color: #800080 !important; /* Darker Purple */
+  background-color: #800080 !important;
 }
 
 /* Disabled Button */
 .run-model-button:disabled {
-  background-color: #cccccc !important; /* Gray for disabled state */
+  background-color: #cccccc !important;
   color: #666666 !important;
   cursor: not-allowed;
 }
 
-/* Responsive adjustments */
+/* Responsive Adjustments */
 @media (max-width: 768px) {
   .header {
     width: 100%;
@@ -187,6 +187,10 @@ label {
   }
 
   .dataset-section {
-    margin-top: 110px; /* Moves it even further down for mobile */
+    margin-top: 100px; /* Moves it even further down for mobile */
+  }
+
+  .run-model-button {
+    margin-top: 60px; /* Adjusted for smaller screens */
   }
 }
