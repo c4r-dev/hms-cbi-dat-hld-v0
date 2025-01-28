@@ -1,0 +1,195 @@
+/* Import General Sans from Fontshare */
+@import url("https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap");
+
+/* Reset default margins and paddings */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Apply General Sans as the default font */
+body {
+  font-family: "General Sans", sans-serif;
+  /* background-color: #f4f6f8; */
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-wrap: balance;
+}
+
+/* Header styling - Positioned at the top-left */
+.header {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 900px;
+}
+
+/* Rotated favicon */
+.favicon {
+  width: 40px;
+  height: 40px;
+  transform: rotate(90deg);
+}
+
+/* Title text styling */
+.title {
+  font-size: clamp(16px, 2vw, 20px);
+  font-weight: bold;
+  text-align: left;
+  color: #333;
+  line-height: 1.4;
+  max-width: 600px;
+}
+
+/* Styling for the checkbox labels */
+label {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Flat Rectangular Cylinder Styling */
+.tube {
+  width: 100px;
+  height: 180px;
+  position: relative;
+  background: #ddd;
+  border: 2px solid #888;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+/* Move Training rectangle more to the right */
+.training-container {
+  transform: translateX(90px);
+  margin-top: 15px;
+}
+
+/* Move Testing rectangle more to the left */
+.testing-container {
+  transform: translateX(-90px);
+  margin-top: 15px;
+}
+
+/* Liquid Fill */
+.tube-fill {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  transition: height 0.3s ease;
+}
+
+/* Purple Gradient for Liquid Fill */
+.training-fill {
+  background: linear-gradient(
+    to top,
+    #4b0082, #800080, #9400d3, #9932cc, #ba55d3
+  );
+}
+
+.testing-fill {
+  background: linear-gradient(
+    to top,
+    #ba55d3, #9932cc, #9400d3, #800080, #4b0082
+  );
+}
+
+/* Box around subset numbers */
+.subset-box {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #888;
+  background: #fff;
+  font-weight: bold;
+  margin: 0 5px;
+}
+
+/* Aligns checkboxes and numbers closer together */
+.subset-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+/* Move Data Subsets Section Further Down */
+.dataset-section {
+  margin-top: 100px; /* Moved even further down */
+}
+
+/* Run Model Button */
+.run-model-button {
+  background-color: #9932cc  !important; /* Purple */
+  color: white !important;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  margin-top: 50px; /* Keeps the button lower */
+  border-radius: 5px;
+  text-transform: none;
+  transition: background 0.3s ease-in-out;
+}
+
+/* Hover effect */
+.run-model-button:hover {
+  background-color: #800080 !important; /* Darker Purple */
+}
+
+/* Disabled Button */
+.run-model-button:disabled {
+  background-color: #cccccc !important; /* Gray for disabled state */
+  color: #666666 !important;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .header {
+    width: 100%;
+    left: 10px;
+    top: 10px;
+  }
+
+  .title {
+    font-size: clamp(14px, 2vw, 18px);
+    max-width: 85vw;
+  }
+
+  .tube {
+    width: 80px;
+    height: 160px;
+  }
+
+  .subset-box {
+    width: 35px;
+    height: 35px;
+  }
+
+  /* Adjustments for small screens */
+  .training-container {
+    transform: translateX(45px);
+  }
+
+  .testing-container {
+    transform: translateX(-45px);
+  }
+
+  .dataset-section {
+    margin-top: 90px; /* Moves it even further down for mobile */
+  }
+
+  
+}
