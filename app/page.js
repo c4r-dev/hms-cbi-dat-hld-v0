@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Box, Checkbox, Typography, Button } from "@mui/material";
 
 export default function Home() {
@@ -10,6 +11,8 @@ export default function Home() {
     dataset3: { training: false, testing: false },
     dataset4: { training: false, testing: false },
   });
+
+  const router = useRouter();
 
   const handleChange = (dataset, type) => {
     setDatasets((prev) => ({
@@ -22,7 +25,10 @@ export default function Home() {
   };
 
   const handleRunModel = () => {
-    alert("Model is running!"); // Replace with actual model execution logic
+    const queryString = new URLSearchParams({
+      data: JSON.stringify(datasets),
+    }).toString();
+    router.push(`/result?${queryString}`);
   };
 
   const isButtonDisabled = () => {
@@ -70,7 +76,11 @@ export default function Home() {
             Data Subsets
           </Typography>
           {Object.keys(datasets).map((dataset, index) => (
-            <Box key={dataset} className="subset-container" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box
+              key={dataset}
+              className="subset-container"
+              sx={{ display: "flex", alignItems: "center", gap: 1 }}
+            >
               <Checkbox
                 checked={datasets[dataset].training}
                 onChange={() => handleChange(dataset, "training")}
