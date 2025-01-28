@@ -68,16 +68,26 @@ label {
   align-items: flex-end;
 }
 
-/* Move Training rectangle more to the right */
+/* Move Training farther to the left, overlapping Data Subsets */
 .training-container {
-  transform: translateX(90px);
-  margin-top: 15px;
+  position: absolute;
+  left: 300px; /* Move it farther left */
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Move Testing rectangle more to the left */
+/* Move Testing farther to the right, overlapping Data Subsets */
 .testing-container {
-  transform: translateX(-90px);
-  margin-top: 15px;
+  position: absolute;
+  right: 300px; /* Move it farther right */
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Liquid Fill */
@@ -122,6 +132,16 @@ label {
   align-items: center;
   justify-content: center;
   gap: 3px;
+}
+
+/* Centered Dataset Section */
+.dataset-section {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Move Data Subsets Section Further Down */
@@ -179,11 +199,11 @@ label {
 
   /* Adjustments for small screens */
   .training-container {
-    transform: translateX(45px);
+    left: -120px; /* Adjust positioning for smaller screens */
   }
 
   .testing-container {
-    transform: translateX(-45px);
+    right: -120px; /* Adjust positioning for smaller screens */
   }
 
   .dataset-section {
