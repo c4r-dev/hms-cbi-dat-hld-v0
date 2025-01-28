@@ -3,10 +3,10 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Box, Typography, CircularProgress, Switch, FormControlLabel } from "@mui/material";
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend } from "chart.js";
+import { Line } from "react-chartjs-2";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend);
 
 function ActualPerformanceContent() {
   const searchParams = useSearchParams();
@@ -19,20 +19,24 @@ function ActualPerformanceContent() {
   const predictedValue = predictedPerformance ? parseFloat(predictedPerformance) : 0;
   const actualValue = actualPerformance ? parseFloat(actualPerformance) : 0;
 
+  // Calculate error in accuracy estimation
+  const errorValue = predictedValue - actualValue; // Difference between guess and actual
+  const actualReference = 0; // Actual Model Performance is set at 0
+
+  // Create dataset for thin vertical lines at "Your Guess" and "Actual Model Performance"
+  const createVerticalLineDataset = (xValue, color) => ({
+    label: "",
+    data: [{ x: xValue, y: 0 }, { x: xValue, y: 1 }],
+    borderColor: color,
+    borderWidth: 2,
+    pointRadius: 0,
+  });
+
   // Chart data
   const chartData = {
-    labels: ["Performance"],
     datasets: [
-      {
-        label: "Your Guess",
-        data: [predictedValue],
-        backgroundColor: "orange",
-      },
-      {
-        label: "Actual Model Performance",
-        data: [actualValue],
-        backgroundColor: "#29D1C4",
-      },
+      createVerticalLineDataset(actualReference, "#29D1C4"), // Actual Performance at 0
+      createVerticalLineDataset(errorValue, "orange"), // Error estimation (Your Guess - Actual)
     ],
   };
 
@@ -40,17 +44,20 @@ function ActualPerformanceContent() {
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: { display: true, position: "top" },
+      legend: { display: false }, // Hides legend
       tooltip: { enabled: true },
     },
     scales: {
+      x: {
+        type: "linear",
+        position: "bottom",
+        min: -30,
+        max: 30,
+        ticks: { stepSize: 10 },
+        title: { display: true, text: "Calculate the Error in Accuracy Estimation" },
+      },
       y: {
-        beginAtZero: true,
-        max: 100,
-        title: {
-          display: true,
-          text: "Performance (%)",
-        },
+        display: false, // Hides the y-axis
       },
     },
   };
@@ -119,12 +126,12 @@ function ActualPerformanceContent() {
         />
       </Box>
 
-      {/* Graph Visualization */}
-      <Box sx={{ width: "80%", maxWidth: "600px", mx: "auto" }}>
+      {/* Horizontal Number Line */}
+      <Box sx={{ width: "80%", maxWidth: "700px", mx: "auto", mt: 4 }}>
         <Typography variant="h6" gutterBottom>
-          Performance Graph
+          Performance Error Graph
         </Typography>
-        <Bar data={chartData} options={chartOptions} />
+        <Line data={chartData} options={chartOptions} />
       </Box>
 
       {/* Placeholder for future user results */}
