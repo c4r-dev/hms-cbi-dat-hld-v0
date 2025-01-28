@@ -61,56 +61,47 @@ function ActualPerformanceContent() {
         Performance Comparison
       </Typography>
 
-      {/* User's Prediction Box */}
-      <Box
-        sx={{
-          display: "inline-block",
-          padding: "20px",
-          background: "#FFD699",
-          borderRadius: "10px",
-          fontSize: "24px",
-          minWidth: "250px",
-          marginBottom: "50px",
-        }}
-      >
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          Your Guess
-        </Typography>
-        <Typography variant="h5" sx={{ color: "black" }}>
-          {predictedPerformance ? `${predictedPerformance}%` : "N/A"}
-        </Typography>
+      {/* User's Prediction and Actual Performance Box - With White Space */}
+      <Box sx={{ display: "flex", justifyContent: "center", gap: 6, mb: 3 }}>
+        {/* User's Prediction Box */}
+        <Box
+          sx={{
+            padding: "20px",
+            background: "#FFD699",
+            borderRadius: "10px",
+            fontSize: "24px",
+            minWidth: "250px",
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Your Guess
+          </Typography>
+          <Typography variant="h5" sx={{ color: "black" }}>
+            {predictedPerformance ? `${predictedPerformance}%` : "N/A"}
+          </Typography>
+        </Box>
+
+        {/* Actual Performance Box */}
+        <Box
+          sx={{
+            padding: "20px",
+            background: "#29D1C4",
+            borderRadius: "10px",
+            fontSize: "24px",
+            minWidth: "250px",
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Actual Model Performance
+          </Typography>
+          <Typography variant="h5" sx={{ color: "black" }}>
+            {actualPerformance ? `${actualPerformance}%` : "N/A"}
+          </Typography>
+        </Box>
       </Box>
 
-      {/* Actual Performance Box */}
-      <Box
-        sx={{
-          display: "inline-block",
-          padding: "20px",
-          background: "#29D1C4",
-          borderRadius: "10px",
-          fontSize: "24px",
-          minWidth: "250px",
-          marginBottom: "30px",
-        }}
-      >
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          Actual Model Performance
-        </Typography>
-        <Typography variant="h5" sx={{ color: "black" }}>
-          {actualPerformance ? `${actualPerformance}%` : "N/A"}
-        </Typography>
-      </Box>
-
-      {/* Graph Visualization */}
-      <Box sx={{ mt: 4, width: "80%", maxWidth: "600px", mx: "auto" }}>
-        <Typography variant="h6" gutterBottom>
-          Performance Graph
-        </Typography>
-        <Bar data={chartData} options={chartOptions} />
-      </Box>
-
-      {/* Toggle Switch - Now Smaller */}
-      <Box sx={{ mt: 4 }}>
+      {/* Toggle Switch - Moved Closer to Boxes */}
+      <Box sx={{ mb: 3 }}>
         <FormControlLabel
           control={
             <Switch
@@ -125,8 +116,15 @@ function ActualPerformanceContent() {
               Show Results From All Users
             </Typography>
           }
-          sx={{ mt: 2 }}
         />
+      </Box>
+
+      {/* Graph Visualization */}
+      <Box sx={{ width: "80%", maxWidth: "600px", mx: "auto" }}>
+        <Typography variant="h6" gutterBottom>
+          Performance Graph
+        </Typography>
+        <Bar data={chartData} options={chartOptions} />
       </Box>
 
       {/* Placeholder for future user results */}
