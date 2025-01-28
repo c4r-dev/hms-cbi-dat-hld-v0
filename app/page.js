@@ -58,35 +58,20 @@ export default function Home() {
 
         {/* Dataset Selection (Centered between Training & Testing) */}
         <Grid item xs={4} className="dataset-section">
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 10 }}>
             <Typography variant="h6" mb={1} sx={{ textWrap: "balance" }}>Data Subsets</Typography>
             {Object.keys(datasets).map((dataset, index) => (
               <Box key={dataset} className="subset-container">
-                {/* Training Checkbox (Moved to the left) */}
-                <Checkbox
-                  checked={datasets[dataset].training}
-                  onChange={() => handleChange(dataset, "training")}
-                />
-                
-                {/* Boxed Subset Number */}
-                <Box className="subset-box">
-                  {index + 1}
-                </Box>
-
-                {/* Testing Checkbox (Remains on the right) */}
-                <Checkbox
-                  checked={datasets[dataset].testing}
-                  onChange={() => handleChange(dataset, "testing")}
-                />
+                <Checkbox checked={datasets[dataset].training} onChange={() => handleChange(dataset, "training")} />
+                <Box className="subset-box">{index + 1}</Box>
+                <Checkbox checked={datasets[dataset].testing} onChange={() => handleChange(dataset, "testing")} />
               </Box>
             ))}
-
-            {/* Run Model Button */}
             <Button 
               variant="contained" 
               className="run-model-button"
               onClick={handleRunModel}
-              disabled={isButtonDisabled()} // Disable if no Training & Testing subset selected
+              disabled={isButtonDisabled()}
             >
               Run Model
             </Button>
@@ -97,11 +82,7 @@ export default function Home() {
         <Grid item xs={4} sx={{ display: "flex", flexDirection: "column", alignItems: "center" }} className="testing-container">
           <Typography mb={1} variant="h6" sx={{ textWrap: "balance" }}>Testing</Typography>
           <Box className="tube">
-            {/* Liquid Fill */}
-            <Box
-              className="tube-fill testing-fill"
-              sx={{ height: calculateFill("testing") }}
-            />
+            <Box className="tube-fill testing-fill" sx={{ height: calculateFill("testing") }} />
           </Box>
         </Grid>
       </Grid>

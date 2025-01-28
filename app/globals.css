@@ -11,7 +11,6 @@
 /* Apply General Sans as the default font */
 body {
   font-family: "General Sans", sans-serif;
-  /* background-color: #f4f6f8; */
   color: #333;
   min-height: 100vh;
   display: flex;
@@ -127,7 +126,7 @@ label {
 
 /* Move Data Subsets Section Further Down */
 .dataset-section {
-  margin-top: 100px; /* Moved even further down */
+  margin-top: 120px; /* Increased margin for more space below */
 }
 
 /* Run Model Button */
@@ -137,7 +136,7 @@ label {
   font-size: 16px;
   font-weight: bold;
   padding: 10px 20px;
-  margin-top: 50px; /* Keeps the button lower */
+  margin-top: 70px; /* Increased margin for more space above */
   border-radius: 5px;
   text-transform: none;
   transition: background 0.3s ease-in-out;
@@ -188,8 +187,6 @@ label {
   }
 
   .dataset-section {
-    margin-top: 90px; /* Moves it even further down for mobile */
+    margin-top: 110px; /* Moves it even further down for mobile */
   }
-
-  
 }
