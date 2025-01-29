@@ -30,7 +30,7 @@ function ActualPerformanceContent() {
         .then((data) => {
           if (data.errors) {
             setOriginalUserErrors(data.errors);
-            console.log("Original User Errors:", data.errors);
+            // console.log("Original User Errors:", data.errors);
 
             const allTrueData = data.errors.filter((doc) => {
               const subsets = doc.selected_subsets;
@@ -47,7 +47,7 @@ function ActualPerformanceContent() {
             });
 
             setAllTrueFilteredErrors(allTrueData);
-            console.log("All-True Filtered User Errors:", allTrueData);
+            // console.log("All-True Filtered User Errors:", allTrueData);
 
             const filteredErrors = data.errors.filter((doc) => {
               const subsets = doc.selected_subsets;
@@ -63,7 +63,7 @@ function ActualPerformanceContent() {
               );
             });
 
-            console.log("Filtered User Errors:", filteredErrors);
+            // console.log("Filtered User Errors:", filteredErrors);
             setFilteredUserErrors(filteredErrors);
           }
         })
