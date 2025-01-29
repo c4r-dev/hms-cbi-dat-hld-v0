@@ -1,21 +1,14 @@
+import clientPromise from "../../../lib/mongodb";
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 
 export async function POST(request) {
   try {
     const data = await request.json();
-    const filePath = path.join(process.cwd(), "public", "datahold1.json");
+    const client = await clientPromise;
+    const db = client.db("c4r"); // Replace with your database name
+    const collection = db.collection("datahold1"); // Collection to store user data
 
-    let existingData = [];
-    if (fs.existsSync(filePath)) {
-      const fileContent = fs.readFileSync(filePath, "utf8");
-      existingData = JSON.parse(fileContent);
-    }
-
-    existingData.push(data);
-
-    fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2), "utf8");
+    await collection.insertOne(data);
 
     return NextResponse.json({ message: "User data saved successfully" }, { status: 200 });
   } catch (error) {
