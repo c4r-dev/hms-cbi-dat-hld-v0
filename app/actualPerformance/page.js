@@ -17,11 +17,34 @@ function ActualPerformanceContent() {
   const [originalUserErrors, setOriginalUserErrors] = useState([]);
   const [filteredUserErrors, setFilteredUserErrors] = useState([]);
   const [allTrueFilteredErrors, setAllTrueFilteredErrors] = useState([]);
-  const dataSaved = useRef(false);
+  const dataSaved = useRef(false); // Prevent duplicate saves
 
   const predictedValue = predictedPerformance ? parseFloat(predictedPerformance) : 0;
   const actualValue = actualPerformance ? parseFloat(actualPerformance) : 0;
   const errorValue = predictedValue - actualValue;
+
+  // Save data to MongoDB on first render
+  useEffect(() => {
+    if (!dataSaved.current) {
+      const userData = {
+        predicted_performance: predictedValue,
+        actual_performance: actualValue,
+        error_in_accuracy: errorValue,
+        timestamp: new Date().toISOString(),
+      };
+
+      fetch("/api/saveUserData", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      })
+        .then((res) => res.json())
+        .then((data) => console.log("Data saved to MongoDB:", data))
+        .catch((error) => console.error("Error saving data:", error));
+
+      dataSaved.current = true;
+    }
+  }, []);
 
   useEffect(() => {
     fetch("/api/getAllUserErrors")
@@ -157,12 +180,12 @@ function ActualPerformanceContent() {
           datasets: [
             ...(showAllResults
               ? [
-                  { type: "bar", label: "Non-overlapping Data", data: histogramBins, backgroundColor: "#FFE5B4", barPercentage: 0.9, categoryPercentage: 1.0 },
-                  { type: "bar", label: "Overlapping Data", data: allTrueHistogramBins, backgroundColor: "#29B6F6", barPercentage: 0.9, categoryPercentage: 1.0 },
+                  { type: "bar", label: "Non-overlapping Data", data: histogramBins, backgroundColor: "#FFE5B4" },
+                  { type: "bar", label: "Overlapping Data", data: allTrueHistogramBins, backgroundColor: "#29B6F6" },
                 ]
               : []),
-            { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#29D1C4", borderWidth: 2, pointRadius: 0 },
-            { type: "line", label: "Your Guess", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "orange", borderWidth: 2, pointRadius: 0 },
+            { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#29D1C4" },
+            { type: "line", label: "Your Guess", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "orange" },
           ]}} options={chartOptions} />
       </Box>
 
