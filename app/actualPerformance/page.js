@@ -10,13 +10,13 @@ ChartJS.register(CategoryScale, LinearScale, BarController, BarElement, LineCont
 
 function ActualPerformanceContent() {
   const searchParams = useSearchParams();
-  const dataString = searchParams.get("data");
   const predictedPerformance = searchParams.get("predicted");
   const actualPerformance = searchParams.get("actual");
 
   const [showAllResults, setShowAllResults] = useState(false);
-  const [originalUserErrors, setOriginalUserErrors] = useState([]); // Full JSON response for future features
-  const [filteredUserErrors, setFilteredUserErrors] = useState([]); // Filtered dataset for bar graph
+  const [originalUserErrors, setOriginalUserErrors] = useState([]);
+  const [filteredUserErrors, setFilteredUserErrors] = useState([]);
+  const [allTrueFilteredErrors, setAllTrueFilteredErrors] = useState([]);
   const dataSaved = useRef(false);
 
   const predictedValue = predictedPerformance ? parseFloat(predictedPerformance) : 0;
@@ -24,42 +24,31 @@ function ActualPerformanceContent() {
   const errorValue = predictedValue - actualValue;
 
   useEffect(() => {
-    if (!dataSaved.current && dataString && predictedPerformance && actualPerformance) {
-      const parsedData = JSON.parse(decodeURIComponent(dataString));
-      const userData = {
-        timestamp: new Date().toISOString(),
-        selected_subsets: parsedData,
-        your_guess: predictedValue,
-        actual_performance: actualValue,
-        error_in_accuracy: errorValue,
-      };
-
-      fetch("/api/saveUserData", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userData),
-      })
-        .then((response) => response.json())
-        .then(() => {
-          dataSaved.current = true;
-        })
-        .catch((error) => console.error("Error saving user data:", error));
-    }
-  }, [dataString, predictedPerformance, actualPerformance]);
-
-  // Fetch last 1000 user errors when the toggle is turned ON
-  useEffect(() => {
     if (showAllResults) {
       fetch("/api/getAllUserErrors")
         .then((res) => res.json())
         .then((data) => {
           if (data.errors) {
             setOriginalUserErrors(data.errors);
-
-            // Debug: Log original dataset before filtering
             console.log("Original User Errors:", data.errors);
 
-            // Corrected Filtering Logic
+            const allTrueData = data.errors.filter((doc) => {
+              const subsets = doc.selected_subsets;
+              return (
+                subsets?.dataset1?.training === true &&
+                subsets?.dataset1?.testing === true &&
+                subsets?.dataset2?.training === true &&
+                subsets?.dataset2?.testing === true &&
+                subsets?.dataset3?.training === true &&
+                subsets?.dataset3?.testing === true &&
+                subsets?.dataset4?.training === true &&
+                subsets?.dataset4?.testing === true
+              );
+            });
+
+            setAllTrueFilteredErrors(allTrueData);
+            console.log("All-True Filtered User Errors:", allTrueData);
+
             const filteredErrors = data.errors.filter((doc) => {
               const subsets = doc.selected_subsets;
               return (
@@ -74,9 +63,7 @@ function ActualPerformanceContent() {
               );
             });
 
-            // Debug: Log filtered dataset after filtering
             console.log("Filtered User Errors:", filteredErrors);
-
             setFilteredUserErrors(filteredErrors);
           }
         })
@@ -128,7 +115,7 @@ function ActualPerformanceContent() {
         Performance Comparison
       </Typography>
 
-      {/* 📌 Added Back "Your Guess" & "Actual Model Performance" Boxes */}
+      {/* Your Guess & Actual Performance Boxes */}
       <Box sx={{ display: "flex", justifyContent: "center", gap: 6, mb: 3 }}>
         <Box sx={{ padding: "20px", background: "#FFD699", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
           <Typography variant="h6" sx={{ mb: 1 }}>Your Guess</Typography>
@@ -156,42 +143,44 @@ function ActualPerformanceContent() {
         />
       </Box>
 
-      {/* Combined Chart */}
+      {/* Graph */}
       <Box sx={{ width: "80%", maxWidth: "700px", mx: "auto", mt: 4 }}>
         <Typography variant="h6" gutterBottom>
           Performance Error Distribution
         </Typography>
-        <Line data={{ labels: histogramLabels, datasets: [
-          ...(showAllResults
-            ? [{
-                type: "bar",
-                label: "User Errors",
-                data: histogramBins,
-                backgroundColor: "#FFE5B4",
-                barPercentage: 0.9,
-                categoryPercentage: 1.0,
-                order: 1,
-              }]
-            : []),
-          {
-            type: "line",
-            label: "Actual Model Performance",
-            data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }],
-            borderColor: "#29D1C4",
-            borderWidth: 2,
-            pointRadius: 0,
-            order: 0,
-          },
-          {
-            type: "line",
-            label: "Your Guess",
-            data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }],
-            borderColor: "orange",
-            borderWidth: 2,
-            pointRadius: 0,
-            order: 0,
-          },
-        ]}} options={chartOptions} />
+        <Line data={{
+          labels: histogramLabels,
+          datasets: [
+            ...(showAllResults
+              ? [{
+                  type: "bar",
+                  label: "User Errors",
+                  data: histogramBins,
+                  backgroundColor: "#FFE5B4",
+                  barPercentage: 0.9,
+                  categoryPercentage: 1.0,
+                  order: 1,
+                }]
+              : []),
+            {
+              type: "line",
+              label: "Actual Model Performance",
+              data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }],
+              borderColor: "#29D1C4",
+              borderWidth: 2,
+              pointRadius: 0,
+              order: 0,
+            },
+            {
+              type: "line",
+              label: "Your Guess",
+              data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }],
+              borderColor: "orange",
+              borderWidth: 2,
+              pointRadius: 0,
+              order: 0,
+            }
+          ]}} options={chartOptions} />
       </Box>
     </Box>
   );
