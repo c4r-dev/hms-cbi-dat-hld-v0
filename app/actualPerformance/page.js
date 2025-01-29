@@ -3,10 +3,11 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Box, Typography, CircularProgress, Switch, FormControlLabel } from "@mui/material";
-import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, LineController, LineElement, PointElement, Title, Tooltip, Legend } from "chart.js";
 import { Line } from "react-chartjs-2";
 
-ChartJS.register(CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend);
+// Ensure all necessary Chart.js components are registered
+ChartJS.register(CategoryScale, LinearScale, LineController, LineElement, PointElement, Title, Tooltip, Legend);
 
 function ActualPerformanceContent() {
   const searchParams = useSearchParams();
@@ -150,3 +151,10 @@ function ActualPerformanceContent() {
   );
 }
 
+export default function ActualPerformance() {
+  return (
+    <Suspense fallback={<Box sx={{ textAlign: "center", mt: 12 }}><CircularProgress /></Box>}>
+      <ActualPerformanceContent />
+    </Suspense>
+  );
+}
