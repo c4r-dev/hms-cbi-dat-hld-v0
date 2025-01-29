@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ThemeRegistry from "./ThemeRegistry";
 import "./globals.css";
 
@@ -16,7 +17,11 @@ export default function RootLayout({ children }) {
         <ThemeRegistry>
           {/* Header */}
           <header className="header">
-            <img src="/favicon.ico" alt="Favicon" className="favicon" />
+            {/* 📌 Wrapped favicon inside Link */}
+            <Link href="/">
+              <img src="/favicon.ico" alt="Favicon" className="favicon" style={{ cursor: "pointer" }} />
+            </Link>
+            
             <h1 className="title">
               We’ve got this model - we think it performs great. <br />
               Here's how we selected the training and testing data for it.
