@@ -24,52 +24,50 @@ function ActualPerformanceContent() {
   const errorValue = predictedValue - actualValue;
 
   useEffect(() => {
-    if (showAllResults) {
-      fetch("/api/getAllUserErrors")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.errors) {
-            setOriginalUserErrors(data.errors);
-            // console.log("Original User Errors:", data.errors);
+    fetch("/api/getAllUserErrors")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.errors) {
+          setOriginalUserErrors(data.errors);
+          console.log("Original User Errors:", data.errors);
 
-            const allTrueData = data.errors.filter((doc) => {
-              const subsets = doc.selected_subsets;
-              return (
-                subsets?.dataset1?.training === true &&
-                subsets?.dataset1?.testing === true &&
-                subsets?.dataset2?.training === true &&
-                subsets?.dataset2?.testing === true &&
-                subsets?.dataset3?.training === true &&
-                subsets?.dataset3?.testing === true &&
-                subsets?.dataset4?.training === true &&
-                subsets?.dataset4?.testing === true
-              );
-            });
+          const allTrueData = data.errors.filter((doc) => {
+            const subsets = doc.selected_subsets;
+            return (
+              subsets?.dataset1?.training === true &&
+              subsets?.dataset1?.testing === true &&
+              subsets?.dataset2?.training === true &&
+              subsets?.dataset2?.testing === true &&
+              subsets?.dataset3?.training === true &&
+              subsets?.dataset3?.testing === true &&
+              subsets?.dataset4?.training === true &&
+              subsets?.dataset4?.testing === true
+            );
+          });
 
-            setAllTrueFilteredErrors(allTrueData);
-            // console.log("All-True Filtered User Errors:", allTrueData);
+          setAllTrueFilteredErrors(allTrueData);
+          console.log("All-True Filtered User Errors:", allTrueData);
 
-            const filteredErrors = data.errors.filter((doc) => {
-              const subsets = doc.selected_subsets;
-              return (
-                subsets?.dataset1?.training === false ||
-                subsets?.dataset1?.testing === false ||
-                subsets?.dataset2?.training === false ||
-                subsets?.dataset2?.testing === false ||
-                subsets?.dataset3?.training === false ||
-                subsets?.dataset3?.testing === false ||
-                subsets?.dataset4?.training === false ||
-                subsets?.dataset4?.testing === false
-              );
-            });
+          const filteredErrors = data.errors.filter((doc) => {
+            const subsets = doc.selected_subsets;
+            return (
+              subsets?.dataset1?.training === false ||
+              subsets?.dataset1?.testing === false ||
+              subsets?.dataset2?.training === false ||
+              subsets?.dataset2?.testing === false ||
+              subsets?.dataset3?.training === false ||
+              subsets?.dataset3?.testing === false ||
+              subsets?.dataset4?.training === false ||
+              subsets?.dataset4?.testing === false
+            );
+          });
 
-            // console.log("Filtered User Errors:", filteredErrors);
-            setFilteredUserErrors(filteredErrors);
-          }
-        })
-        .catch((error) => console.error("Error fetching user data:", error));
-    }
-  }, [showAllResults]);
+          console.log("Filtered User Errors:", filteredErrors);
+          setFilteredUserErrors(filteredErrors);
+        }
+      })
+      .catch((error) => console.error("Error fetching user data:", error));
+  }, []);
 
   // Process user errors into histogram bins (3% width)
   const binWidth = 3;
@@ -104,8 +102,6 @@ function ActualPerformanceContent() {
         position: "bottom",
         min: -40,
         max: 40,
-        suggestedMin: -40,
-        suggestedMax: 40,
         beginAtZero: false,
         ticks: { stepSize: 5 },
         title: { display: true, text: "Calculate the Error in Accuracy Estimation" },
@@ -151,7 +147,7 @@ function ActualPerformanceContent() {
         />
       </Box>
 
-      {/* Graph */}
+      {/* Chart */}
       <Box sx={{ width: "80%", maxWidth: "700px", mx: "auto", mt: 4 }}>
         <Typography variant="h6" gutterBottom>
           Performance Error Distribution
@@ -161,22 +157,26 @@ function ActualPerformanceContent() {
           datasets: [
             ...(showAllResults
               ? [
-                  { type: "bar", label: "Filtered User Errors (Orange)", data: histogramBins, backgroundColor: "#FFE5B4", barPercentage: 0.9, categoryPercentage: 1.0, order: 1 },
-                  { type: "bar", label: "All-True User Errors (Teal)", data: allTrueHistogramBins, backgroundColor: "#29B6F6", barPercentage: 0.9, categoryPercentage: 1.0, order: 2 },
+                  { type: "bar", label: "Non-overlapping Data", data: histogramBins, backgroundColor: "#FFE5B4", barPercentage: 0.9, categoryPercentage: 1.0 },
+                  { type: "bar", label: "Overlapping Data", data: allTrueHistogramBins, backgroundColor: "#29B6F6", barPercentage: 0.9, categoryPercentage: 1.0 },
                 ]
               : []),
-            { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#29D1C4", borderWidth: 2, pointRadius: 0, order: 0 },
-            { type: "line", label: "Your Guess", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "orange", borderWidth: 2, pointRadius: 0, order: 0 },
+            { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#29D1C4", borderWidth: 2, pointRadius: 0 },
+            { type: "line", label: "Your Guess", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "orange", borderWidth: 2, pointRadius: 0 },
           ]}} options={chartOptions} />
+      </Box>
+
+      {/* Legend Below Chart */}
+      <Box sx={{ display: "flex", justifyContent: "center", gap: 3, mt: 3 }}>
+        <Box sx={{ width: 20, height: 20, backgroundColor: "#FFE5B4", borderRadius: 2 }} />
+        <Typography>Non-overlapping data in training and testing</Typography>
+        <Box sx={{ width: 20, height: 20, backgroundColor: "#29B6F6", borderRadius: 2 }} />
+        <Typography>Overlapping data in training and testing</Typography>
       </Box>
     </Box>
   );
 }
 
 export default function ActualPerformance() {
-  return (
-    <Suspense fallback={<Box sx={{ textAlign: "center", mt: 12 }}><CircularProgress /></Box>}>
-      <ActualPerformanceContent />
-    </Suspense>
-  );
+  return <Suspense fallback={<Box sx={{ textAlign: "center", mt: 12 }}><CircularProgress /></Box>}><ActualPerformanceContent /></Suspense>;
 }
