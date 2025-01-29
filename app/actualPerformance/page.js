@@ -15,7 +15,8 @@ function ActualPerformanceContent() {
   const actualPerformance = searchParams.get("actual");
 
   const [showAllResults, setShowAllResults] = useState(false);
-  const [userErrors, setUserErrors] = useState([]);
+  const [originalUserErrors, setOriginalUserErrors] = useState([]); // Full JSON response for future features
+  const [filteredUserErrors, setFilteredUserErrors] = useState([]); // Filtered dataset for bar graph
   const dataSaved = useRef(false);
 
   const predictedValue = predictedPerformance ? parseFloat(predictedPerformance) : 0;
@@ -53,7 +54,30 @@ function ActualPerformanceContent() {
         .then((res) => res.json())
         .then((data) => {
           if (data.errors) {
-            setUserErrors(data.errors);
+            setOriginalUserErrors(data.errors);
+
+            // Debug: Log original dataset before filtering
+            console.log("Original User Errors:", data.errors);
+
+            // Corrected Filtering Logic
+            const filteredErrors = data.errors.filter((doc) => {
+              const subsets = doc.selected_subsets;
+              return (
+                subsets?.dataset1?.training === false ||
+                subsets?.dataset1?.testing === false ||
+                subsets?.dataset2?.training === false ||
+                subsets?.dataset2?.testing === false ||
+                subsets?.dataset3?.training === false ||
+                subsets?.dataset3?.testing === false ||
+                subsets?.dataset4?.training === false ||
+                subsets?.dataset4?.testing === false
+              );
+            });
+
+            // Debug: Log filtered dataset after filtering
+            console.log("Filtered User Errors:", filteredErrors);
+
+            setFilteredUserErrors(filteredErrors);
           }
         })
         .catch((error) => console.error("Error fetching user data:", error));
@@ -62,60 +86,17 @@ function ActualPerformanceContent() {
 
   // Process user errors into histogram bins (3% width)
   const binWidth = 3;
-  const histogramBins = new Array(27).fill(0); // Bins from -40 to 40, step 3
+  const histogramBins = new Array(27).fill(0);
 
-  userErrors.forEach((err) => {
-    const binIndex = Math.floor((err + 40) / binWidth);
+  filteredUserErrors.forEach((err) => {
+    const binIndex = Math.floor((err.error_in_accuracy + 40) / binWidth);
     if (binIndex >= 0 && binIndex < histogramBins.length) {
       histogramBins[binIndex]++;
     }
   });
 
-  // Generate labels for bins (-40 to 40, step 3)
   const histogramLabels = Array.from({ length: histogramBins.length }, (_, i) => -40 + i * binWidth);
 
-  // Chart Data (Both Line Chart and Bar Chart Combined)
-  const chartData = {
-    labels: histogramLabels,
-    datasets: [
-      // Bar chart for User Errors (Only shown when showAllResults is ON)
-      ...(showAllResults
-        ? [
-            {
-              type: "bar",
-              label: "User Errors",
-              data: histogramBins,
-              backgroundColor: "#FFE5B4", // **Lighter Orange**
-              barPercentage: 0.9, // Keeps bars properly sized
-              categoryPercentage: 1.0,
-              order: 1,
-            },
-          ]
-        : []),
-      // Line for Actual Model Performance
-      {
-        type: "line",
-        label: "Actual Model Performance",
-        data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }],
-        borderColor: "#29D1C4",
-        borderWidth: 2,
-        pointRadius: 0,
-        order: 0,
-      },
-      // Line for User's Guess
-      {
-        type: "line",
-        label: "Your Guess",
-        data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }],
-        borderColor: "orange",
-        borderWidth: 2,
-        pointRadius: 0,
-        order: 0,
-      },
-    ],
-  };
-
-  // Chart Options
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -126,17 +107,17 @@ function ActualPerformanceContent() {
       x: {
         type: "linear",
         position: "bottom",
-        min: -40, // 🔹 Fully locks x-axis from -40 to 40
-        max: 40, 
-        suggestedMin: -40, // 🔹 Prevents auto-scaling
+        min: -40,
+        max: 40,
+        suggestedMin: -40,
         suggestedMax: 40,
-        beginAtZero: false, // 🔹 Stops stretching beyond fixed range
-        ticks: { stepSize: 5 }, 
+        beginAtZero: false,
+        ticks: { stepSize: 5 },
         title: { display: true, text: "Calculate the Error in Accuracy Estimation" },
       },
       y: {
         display: true,
-        beginAtZero: true, // Ensures bars start from zero
+        beginAtZero: true,
       },
     },
   };
@@ -147,7 +128,7 @@ function ActualPerformanceContent() {
         Performance Comparison
       </Typography>
 
-      {/* User's Prediction and Actual Performance Box */}
+      {/* 📌 Added Back "Your Guess" & "Actual Model Performance" Boxes */}
       <Box sx={{ display: "flex", justifyContent: "center", gap: 6, mb: 3 }}>
         <Box sx={{ padding: "20px", background: "#FFD699", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
           <Typography variant="h6" sx={{ mb: 1 }}>Your Guess</Typography>
@@ -180,7 +161,37 @@ function ActualPerformanceContent() {
         <Typography variant="h6" gutterBottom>
           Performance Error Distribution
         </Typography>
-        <Line data={chartData} options={chartOptions} />
+        <Line data={{ labels: histogramLabels, datasets: [
+          ...(showAllResults
+            ? [{
+                type: "bar",
+                label: "User Errors",
+                data: histogramBins,
+                backgroundColor: "#FFE5B4",
+                barPercentage: 0.9,
+                categoryPercentage: 1.0,
+                order: 1,
+              }]
+            : []),
+          {
+            type: "line",
+            label: "Actual Model Performance",
+            data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }],
+            borderColor: "#29D1C4",
+            borderWidth: 2,
+            pointRadius: 0,
+            order: 0,
+          },
+          {
+            type: "line",
+            label: "Your Guess",
+            data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }],
+            borderColor: "orange",
+            borderWidth: 2,
+            pointRadius: 0,
+            order: 0,
+          },
+        ]}} options={chartOptions} />
       </Box>
     </Box>
   );
