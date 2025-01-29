@@ -22,7 +22,6 @@ function ResultContent() {
         const jsonData = await response.json();
         const selectedData = JSON.parse(dataString);
 
-        // Convert selected dataset into filter criteria
         const filterCriteria = {
           training_1: selectedData.dataset1.training ? 1 : 0,
           training_2: selectedData.dataset2.training ? 1 : 0,
@@ -34,15 +33,11 @@ function ResultContent() {
           testing_4: selectedData.dataset4.testing ? 1 : 0,
         };
 
-        // Find the first matching object in datahold.json
         const matchedObject = jsonData.find((entry) =>
-          Object.keys(filterCriteria).every(
-            (key) => entry[key] === filterCriteria[key]
-          )
+          Object.keys(filterCriteria).every((key) => entry[key] === filterCriteria[key])
         );
 
-        // Extract test_performance and out_of_sample_performance
-        if (matchedObject) {
+        if (matchedObject?.test_performance !== undefined) {
           setTestPerformance((matchedObject.test_performance * 100).toFixed(2) + "%");
           setOutOfSamplePerformance((matchedObject.out_of_sample_performance * 100).toFixed(2));
         } else {
@@ -57,10 +52,10 @@ function ResultContent() {
     fetchData();
   }, [dataString]);
 
-  const handleSubmit = () => {
+  const handleRunModel = () => {
     if (outOfSamplePerformance !== null) {
       router.push(
-        `/actualPerformance?predicted=${predictedPerformance}&actual=${outOfSamplePerformance}`
+        `/actualPerformance?predicted=${predictedPerformance}&actual=${outOfSamplePerformance}&data=${encodeURIComponent(dataString)}`
       );
     }
   };
@@ -84,7 +79,6 @@ function ResultContent() {
         {testPerformance !== null ? testPerformance : <CircularProgress />}
       </Box>
 
-      {/* Predict Performance Slider */}
       <Box sx={{ mt: 6, width: "80%", maxWidth: "500px", mx: "auto" }}>
         <Typography variant="h6" gutterBottom>
           Predict how well the model will perform on new data
@@ -106,7 +100,6 @@ function ResultContent() {
         </Typography>
       </Box>
 
-      {/* Submit Button */}
       <Box sx={{ mt: 4 }}>
         <Button
           variant="contained"
@@ -119,10 +112,10 @@ function ResultContent() {
             padding: "10px 20px",
             "&:hover": { backgroundColor: "#800080" },
           }}
-          onClick={handleSubmit}
+          onClick={handleRunModel}
           disabled={outOfSamplePerformance === null}
         >
-          Submit Prediction
+          Run Model
         </Button>
       </Box>
     </Box>
