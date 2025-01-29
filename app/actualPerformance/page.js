@@ -3,10 +3,10 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, useEffect, useRef } from "react";
 import { Box, Typography, CircularProgress, Switch, FormControlLabel } from "@mui/material";
-import { Chart as ChartJS, CategoryScale, LinearScale, LineController, LineElement, PointElement, Title, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarController, BarElement, LineController, LineElement, PointElement, Title, Tooltip, Legend } from "chart.js";
 import { Line } from "react-chartjs-2";
 
-ChartJS.register(CategoryScale, LinearScale, LineController, LineElement, PointElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarController, BarElement, LineController, LineElement, PointElement, Title, Tooltip, Legend);
 
 function ActualPerformanceContent() {
   const searchParams = useSearchParams();
@@ -15,7 +15,8 @@ function ActualPerformanceContent() {
   const actualPerformance = searchParams.get("actual");
 
   const [showAllResults, setShowAllResults] = useState(false);
-  const dataSaved = useRef(false); // Prevent multiple saves
+  const [userErrors, setUserErrors] = useState([]);
+  const dataSaved = useRef(false);
 
   const predictedValue = predictedPerformance ? parseFloat(predictedPerformance) : 0;
   const actualValue = actualPerformance ? parseFloat(actualPerformance) : 0;
@@ -39,28 +40,77 @@ function ActualPerformanceContent() {
       })
         .then((response) => response.json())
         .then(() => {
-          dataSaved.current = true; // Mark as saved
+          dataSaved.current = true;
         })
         .catch((error) => console.error("Error saving user data:", error));
     }
   }, [dataString, predictedPerformance, actualPerformance]);
 
-  // Chart Data for Number Line
+  // Fetch last 1000 user errors when the toggle is turned ON
+  useEffect(() => {
+    if (showAllResults) {
+      fetch("/api/getAllUserErrors")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.errors) {
+            setUserErrors(data.errors);
+          }
+        })
+        .catch((error) => console.error("Error fetching user data:", error));
+    }
+  }, [showAllResults]);
+
+  // Process user errors into histogram bins (3% width)
+  const binWidth = 3;
+  const histogramBins = new Array(21).fill(0); // Bins from -30 to 30, step 3
+
+  userErrors.forEach((err) => {
+    const binIndex = Math.floor((err + 30) / binWidth);
+    if (binIndex >= 0 && binIndex < histogramBins.length) {
+      histogramBins[binIndex]++;
+    }
+  });
+
+  // Generate labels for bins (-30 to 30, step 3)
+  const histogramLabels = Array.from({ length: histogramBins.length }, (_, i) => -30 + i * binWidth);
+
+  // Chart Data (Both Line Chart and Bar Chart Combined)
   const chartData = {
+    labels: histogramLabels,
     datasets: [
+      // Bar chart for User Errors
+      ...(showAllResults
+        ? [
+            {
+              type: "bar",
+              label: "User Errors",
+              data: histogramBins,
+              backgroundColor: "#FFE5B4", // **Lighter Orange**
+              barPercentage: 0.9,
+              categoryPercentage: 1.0,
+              order: 1,
+            },
+          ]
+        : []),
+      // Line for Actual Model Performance
       {
-        label: "",
-        data: [{ x: 0, y: 0 }, { x: 0, y: 1 }],
+        type: "line",
+        label: "Actual Model Performance",
+        data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }],
         borderColor: "#29D1C4",
         borderWidth: 2,
         pointRadius: 0,
+        order: 0,
       },
+      // Line for User's Guess
       {
-        label: "",
-        data: [{ x: errorValue, y: 0 }, { x: errorValue, y: 1 }],
+        type: "line",
+        label: "Your Guess",
+        data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }],
         borderColor: "orange",
         borderWidth: 2,
         pointRadius: 0,
+        order: 0,
       },
     ],
   };
@@ -76,12 +126,12 @@ function ActualPerformanceContent() {
       x: {
         type: "linear",
         position: "bottom",
-        min: -30,
-        max: 30,
-        ticks: { stepSize: 10 },
+        min: -40, // 🔹 Locked x-axis from -40 to 40
+        max: 40, 
+        ticks: { stepSize: 5 }, 
         title: { display: true, text: "Calculate the Error in Accuracy Estimation" },
       },
-      y: { display: false },
+      y: { display: true },
     },
   };
 
@@ -119,19 +169,13 @@ function ActualPerformanceContent() {
         />
       </Box>
 
-      {/* Horizontal Number Line Graph */}
+      {/* Combined Chart */}
       <Box sx={{ width: "80%", maxWidth: "700px", mx: "auto", mt: 4 }}>
         <Typography variant="h6" gutterBottom>
-          Performance Error Graph
+          Performance Error Distribution
         </Typography>
         <Line data={chartData} options={chartOptions} />
       </Box>
-
-      {showAllResults && (
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="h6">All User Results Coming Soon...</Typography>
-        </Box>
-      )}
     </Box>
   );
 }
