@@ -74,11 +74,19 @@ function ActualPerformanceContent() {
   // Process user errors into histogram bins (3% width)
   const binWidth = 3;
   const histogramBins = new Array(27).fill(0);
+  const allTrueHistogramBins = new Array(27).fill(0);
 
   filteredUserErrors.forEach((err) => {
     const binIndex = Math.floor((err.error_in_accuracy + 40) / binWidth);
     if (binIndex >= 0 && binIndex < histogramBins.length) {
       histogramBins[binIndex]++;
+    }
+  });
+
+  allTrueFilteredErrors.forEach((err) => {
+    const binIndex = Math.floor((err.error_in_accuracy + 40) / binWidth);
+    if (binIndex >= 0 && binIndex < allTrueHistogramBins.length) {
+      allTrueHistogramBins[binIndex]++;
     }
   });
 
@@ -152,34 +160,13 @@ function ActualPerformanceContent() {
           labels: histogramLabels,
           datasets: [
             ...(showAllResults
-              ? [{
-                  type: "bar",
-                  label: "User Errors",
-                  data: histogramBins,
-                  backgroundColor: "#FFE5B4",
-                  barPercentage: 0.9,
-                  categoryPercentage: 1.0,
-                  order: 1,
-                }]
+              ? [
+                  { type: "bar", label: "Filtered User Errors (Orange)", data: histogramBins, backgroundColor: "#FFE5B4", barPercentage: 0.9, categoryPercentage: 1.0, order: 1 },
+                  { type: "bar", label: "All-True User Errors (Teal)", data: allTrueHistogramBins, backgroundColor: "#29B6F6", barPercentage: 0.9, categoryPercentage: 1.0, order: 2 },
+                ]
               : []),
-            {
-              type: "line",
-              label: "Actual Model Performance",
-              data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }],
-              borderColor: "#29D1C4",
-              borderWidth: 2,
-              pointRadius: 0,
-              order: 0,
-            },
-            {
-              type: "line",
-              label: "Your Guess",
-              data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }],
-              borderColor: "orange",
-              borderWidth: 2,
-              pointRadius: 0,
-              order: 0,
-            }
+            { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#29D1C4", borderWidth: 2, pointRadius: 0, order: 0 },
+            { type: "line", label: "Your Guess", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "orange", borderWidth: 2, pointRadius: 0, order: 0 },
           ]}} options={chartOptions} />
       </Box>
     </Box>
