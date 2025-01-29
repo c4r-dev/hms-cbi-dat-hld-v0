@@ -62,23 +62,23 @@ function ActualPerformanceContent() {
 
   // Process user errors into histogram bins (3% width)
   const binWidth = 3;
-  const histogramBins = new Array(21).fill(0); // Bins from -30 to 30, step 3
+  const histogramBins = new Array(27).fill(0); // Bins from -40 to 40, step 3
 
   userErrors.forEach((err) => {
-    const binIndex = Math.floor((err + 30) / binWidth);
+    const binIndex = Math.floor((err + 40) / binWidth);
     if (binIndex >= 0 && binIndex < histogramBins.length) {
       histogramBins[binIndex]++;
     }
   });
 
-  // Generate labels for bins (-30 to 30, step 3)
-  const histogramLabels = Array.from({ length: histogramBins.length }, (_, i) => -30 + i * binWidth);
+  // Generate labels for bins (-40 to 40, step 3)
+  const histogramLabels = Array.from({ length: histogramBins.length }, (_, i) => -40 + i * binWidth);
 
   // Chart Data (Both Line Chart and Bar Chart Combined)
   const chartData = {
     labels: histogramLabels,
     datasets: [
-      // Bar chart for User Errors
+      // Bar chart for User Errors (Only shown when showAllResults is ON)
       ...(showAllResults
         ? [
             {
@@ -86,7 +86,7 @@ function ActualPerformanceContent() {
               label: "User Errors",
               data: histogramBins,
               backgroundColor: "#FFE5B4", // **Lighter Orange**
-              barPercentage: 0.9,
+              barPercentage: 0.9, // Keeps bars properly sized
               categoryPercentage: 1.0,
               order: 1,
             },
@@ -126,12 +126,18 @@ function ActualPerformanceContent() {
       x: {
         type: "linear",
         position: "bottom",
-        min: -40, // 🔹 Locked x-axis from -40 to 40
+        min: -40, // 🔹 Fully locks x-axis from -40 to 40
         max: 40, 
+        suggestedMin: -40, // 🔹 Prevents auto-scaling
+        suggestedMax: 40,
+        beginAtZero: false, // 🔹 Stops stretching beyond fixed range
         ticks: { stepSize: 5 }, 
         title: { display: true, text: "Calculate the Error in Accuracy Estimation" },
       },
-      y: { display: true },
+      y: {
+        display: true,
+        beginAtZero: true, // Ensures bars start from zero
+      },
     },
   };
 
