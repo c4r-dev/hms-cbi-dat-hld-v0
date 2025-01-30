@@ -12,6 +12,7 @@ function ActualPerformanceContent() {
   const searchParams = useSearchParams();
   const predictedPerformance = searchParams.get("predicted");
   const actualPerformance = searchParams.get("actual");
+  const dataString = searchParams.get("data");
 
   const [showAllResults, setShowAllResults] = useState(false);
   const [originalUserErrors, setOriginalUserErrors] = useState([]);
@@ -23,6 +24,14 @@ function ActualPerformanceContent() {
   const actualValue = actualPerformance ? parseFloat(actualPerformance) : 0;
   const errorValue = predictedValue - actualValue;
 
+  // Parse datasets from query string
+  let datasets = {};
+  try {
+    datasets = dataString ? JSON.parse(decodeURIComponent(dataString)) : {};
+  } catch (error) {
+    console.error("Error parsing datasets:", error);
+  }
+
   // Save data to MongoDB on first render
   useEffect(() => {
     if (!dataSaved.current) {
@@ -31,6 +40,7 @@ function ActualPerformanceContent() {
         actual_performance: actualValue,
         error_in_accuracy: errorValue,
         timestamp: new Date().toISOString(),
+        selected_subsets: datasets, // Save datasets object
       };
 
       fetch("/api/saveUserData", {
@@ -56,16 +66,7 @@ function ActualPerformanceContent() {
 
           const allTrueData = data.errors.filter((doc) => {
             const subsets = doc.selected_subsets;
-            return (
-              subsets?.dataset1?.training === true &&
-              subsets?.dataset1?.testing === true &&
-              subsets?.dataset2?.training === true &&
-              subsets?.dataset2?.testing === true &&
-              subsets?.dataset3?.training === true &&
-              subsets?.dataset3?.testing === true &&
-              subsets?.dataset4?.training === true &&
-              subsets?.dataset4?.testing === true
-            );
+            return Object.values(subsets).every((d) => d.training === true && d.testing === true);
           });
 
           setAllTrueFilteredErrors(allTrueData);
@@ -73,16 +74,7 @@ function ActualPerformanceContent() {
 
           const filteredErrors = data.errors.filter((doc) => {
             const subsets = doc.selected_subsets;
-            return (
-              subsets?.dataset1?.training === false ||
-              subsets?.dataset1?.testing === false ||
-              subsets?.dataset2?.training === false ||
-              subsets?.dataset2?.testing === false ||
-              subsets?.dataset3?.training === false ||
-              subsets?.dataset3?.testing === false ||
-              subsets?.dataset4?.training === false ||
-              subsets?.dataset4?.testing === false
-            );
+            return Object.values(subsets).some((d) => d.training === false || d.testing === false);
           });
 
           console.log("Filtered User Errors:", filteredErrors);
@@ -116,7 +108,14 @@ function ActualPerformanceContent() {
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: { display: false },
+      legend: { 
+        display: showAllResults,  // Legend is only displayed if showAllResults is true
+        position: "top",
+        labels: {
+          font: { size: 14 },
+          color: "#333",
+        },
+      },
       tooltip: { enabled: true },
     },
     scales: {
@@ -136,13 +135,26 @@ function ActualPerformanceContent() {
     },
   };
 
+  const chartData = {
+    labels: histogramLabels,
+    datasets: [
+      ...(showAllResults
+        ? [
+            { type: "bar", label: "Non-overlapping Data", data: histogramBins, backgroundColor: "#FFE5B4" },
+            { type: "bar", label: "Overlapping Data", data: allTrueHistogramBins, backgroundColor: "#29B6F6" },
+          ]
+        : []),
+      { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#29D1C4" },
+      { type: "line", label: "Your Guess", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "orange" },
+    ],
+  };
+
   return (
     <Box sx={{ p: 4, textAlign: "center", mt: 12 }}>
       <Typography variant="h4" gutterBottom>
         Performance Comparison
       </Typography>
 
-      {/* Your Guess & Actual Performance Boxes */}
       <Box sx={{ display: "flex", justifyContent: "center", gap: 6, mb: 3 }}>
         <Box sx={{ padding: "20px", background: "#FFD699", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
           <Typography variant="h6" sx={{ mb: 1 }}>Your Guess</Typography>
@@ -155,7 +167,6 @@ function ActualPerformanceContent() {
         </Box>
       </Box>
 
-      {/* Toggle Switch */}
       <Box sx={{ mb: 3 }}>
         <FormControlLabel
           control={
@@ -170,31 +181,11 @@ function ActualPerformanceContent() {
         />
       </Box>
 
-      {/* Chart */}
       <Box sx={{ width: "80%", maxWidth: "700px", mx: "auto", mt: 4 }}>
         <Typography variant="h6" gutterBottom>
           Performance Error Distribution
         </Typography>
-        <Line data={{
-          labels: histogramLabels,
-          datasets: [
-            ...(showAllResults
-              ? [
-                  { type: "bar", label: "Non-overlapping Data", data: histogramBins, backgroundColor: "#FFE5B4" },
-                  { type: "bar", label: "Overlapping Data", data: allTrueHistogramBins, backgroundColor: "#29B6F6" },
-                ]
-              : []),
-            { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#29D1C4" },
-            { type: "line", label: "Your Guess", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "orange" },
-          ]}} options={chartOptions} />
-      </Box>
-
-      {/* Legend Below Chart */}
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 3, mt: 3 }}>
-        <Box sx={{ width: 20, height: 20, backgroundColor: "#FFE5B4", borderRadius: 2 }} />
-        <Typography>Non-overlapping data in training and testing</Typography>
-        <Box sx={{ width: 20, height: 20, backgroundColor: "#29B6F6", borderRadius: 2 }} />
-        <Typography>Overlapping data in training and testing</Typography>
+        <Line data={chartData} options={chartOptions} />
       </Box>
     </Box>
   );
