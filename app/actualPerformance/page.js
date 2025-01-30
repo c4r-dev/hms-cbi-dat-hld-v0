@@ -18,13 +18,12 @@ function ActualPerformanceContent() {
   const [originalUserErrors, setOriginalUserErrors] = useState([]);
   const [filteredUserErrors, setFilteredUserErrors] = useState([]);
   const [allTrueFilteredErrors, setAllTrueFilteredErrors] = useState([]);
-  const dataSaved = useRef(false); // Prevent duplicate saves
+  const dataSaved = useRef(false);
 
   const predictedValue = predictedPerformance ? parseFloat(predictedPerformance) : 0;
   const actualValue = actualPerformance ? parseFloat(actualPerformance) : 0;
   const errorValue = predictedValue - actualValue;
 
-  // Parse datasets from query string
   let datasets = {};
   try {
     datasets = dataString ? JSON.parse(decodeURIComponent(dataString)) : {};
@@ -32,7 +31,6 @@ function ActualPerformanceContent() {
     console.error("Error parsing datasets:", error);
   }
 
-  // Save data to MongoDB on first render
   useEffect(() => {
     if (!dataSaved.current) {
       const userData = {
@@ -40,7 +38,7 @@ function ActualPerformanceContent() {
         actual_performance: actualValue,
         error_in_accuracy: errorValue,
         timestamp: new Date().toISOString(),
-        selected_subsets: datasets, // Save datasets object
+        selected_subsets: datasets,
       };
 
       fetch("/api/saveUserData", {
@@ -62,7 +60,6 @@ function ActualPerformanceContent() {
       .then((data) => {
         if (data.errors) {
           setOriginalUserErrors(data.errors);
-          console.log("Original User Errors:", data.errors);
 
           const allTrueData = data.errors.filter((doc) => {
             const subsets = doc.selected_subsets;
@@ -70,21 +67,18 @@ function ActualPerformanceContent() {
           });
 
           setAllTrueFilteredErrors(allTrueData);
-          console.log("All-True Filtered User Errors:", allTrueData);
 
           const filteredErrors = data.errors.filter((doc) => {
             const subsets = doc.selected_subsets;
             return Object.values(subsets).some((d) => d.training === false || d.testing === false);
           });
 
-          console.log("Filtered User Errors:", filteredErrors);
           setFilteredUserErrors(filteredErrors);
         }
       })
       .catch((error) => console.error("Error fetching user data:", error));
   }, []);
 
-  // Process user errors into histogram bins (3% width)
   const binWidth = 3;
   const histogramBins = new Array(27).fill(0);
   const allTrueHistogramBins = new Array(27).fill(0);
@@ -109,7 +103,7 @@ function ActualPerformanceContent() {
     responsive: true,
     plugins: {
       legend: { 
-        display: showAllResults,  // Legend is only displayed if showAllResults is true
+        display: showAllResults,
         position: "top",
         labels: {
           font: { size: 14 },
@@ -140,12 +134,12 @@ function ActualPerformanceContent() {
     datasets: [
       ...(showAllResults
         ? [
-            { type: "bar", label: "Non-overlapping Data", data: histogramBins, backgroundColor: "#FFE5B4" },
-            { type: "bar", label: "Overlapping Data", data: allTrueHistogramBins, backgroundColor: "#29B6F6" },
+            { type: "bar", label: "Non-overlapping Data", data: histogramBins, backgroundColor: "rgba(255, 76, 76, 0.6)" }, // RED with transparency
+            { type: "bar", label: "Overlapping Data", data: allTrueHistogramBins, backgroundColor: "rgba(50, 205, 50, 0.6)" }, // GREEN with transparency
           ]
         : []),
-      { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#29D1C4" },
-      { type: "line", label: "Your Guess", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "orange" },
+      { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#007FFF", borderWidth: 3 },
+      { type: "line", label: "Your Guess", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "#8A2BE2", borderWidth: 3 },
     ],
   };
 
@@ -156,27 +150,24 @@ function ActualPerformanceContent() {
       </Typography>
 
       <Box sx={{ display: "flex", justifyContent: "center", gap: 6, mb: 3 }}>
-        <Box sx={{ padding: "20px", background: "#FFD699", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
-          <Typography variant="h6" sx={{ mb: 1 }}>Your Guess</Typography>
-          <Typography variant="h5" sx={{ color: "black" }}>{predictedPerformance ? `${predictedPerformance}%` : "N/A"}</Typography>
+        <Box sx={{ padding: "20px", background: "#8A2BE2", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
+          <Typography variant="h6" sx={{ mb: 1, color: "white" }}>Your Guess</Typography>
+          <Typography variant="h5" sx={{ color: "white" }}>{predictedPerformance ? `${predictedPerformance}%` : "N/A"}</Typography>
         </Box>
 
-        <Box sx={{ padding: "20px", background: "#29D1C4", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
-          <Typography variant="h6" sx={{ mb: 1 }}>Actual Model Performance</Typography>
-          <Typography variant="h5" sx={{ color: "black" }}>{actualPerformance ? `${actualPerformance}%` : "N/A"}</Typography>
+        <Box sx={{ padding: "20px", background: "#007FFF", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
+          <Typography variant="h6" sx={{ mb: 1, color: "white" }}>Actual Model Performance</Typography>
+          <Typography variant="h5" sx={{ color: "white" }}>{actualPerformance ? `${actualPerformance}%` : "N/A"}</Typography>
         </Box>
       </Box>
 
       <Box sx={{ mb: 3 }}>
         <FormControlLabel
-          control={
-            <Switch
-              checked={showAllResults}
-              onChange={() => setShowAllResults((prev) => !prev)}
-              color="primary"
-              sx={{ transform: "scale(1.2)", mr: 1 }}
-            />
-          }
+          control={<Switch checked={showAllResults} onChange={() => setShowAllResults((prev) => !prev)} sx={{
+            "& .MuiSwitch-thumb": { backgroundColor: "#8A2BE2" },
+            "& .Mui-checked": { color: "#8A2BE2" },
+            "& .Mui-checked + .MuiSwitch-track": { backgroundColor: "#8A2BE2" },
+          }} />}
           label={<Typography variant="h6">Show Results From All Users</Typography>}
         />
       </Box>
@@ -192,5 +183,5 @@ function ActualPerformanceContent() {
 }
 
 export default function ActualPerformance() {
-  return <Suspense fallback={<Box sx={{ textAlign: "center", mt: 12 }}><CircularProgress /></Box>}><ActualPerformanceContent /></Suspense>;
+  return <Suspense fallback={<CircularProgress />}><ActualPerformanceContent /></Suspense>;
 }
