@@ -65,7 +65,7 @@ function ActualPerformanceContent() {
 
           const allTrueData = data.errors.filter((doc) => {
             const subsets = doc.selected_subsets;
-            return Object.values(subsets).every((d) => d.training === true && d.testing === true);
+            return Object.values(subsets).some((d) => d.training === true && d.testing === true);
           });
 
           setAllTrueFilteredErrors(allTrueData);
