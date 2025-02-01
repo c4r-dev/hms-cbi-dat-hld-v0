@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, useEffect, useRef } from "react";
-import { Box, Typography, CircularProgress, Switch, FormControlLabel } from "@mui/material";
+import { Box, Typography, CircularProgress, Switch, FormControlLabel, Tooltip as MuiTooltip } from "@mui/material";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarController, BarElement, LineController, LineElement, PointElement, Title, Tooltip, Legend } from "chart.js";
 import { Line } from "react-chartjs-2";
 
@@ -23,6 +23,8 @@ function ActualPerformanceContent() {
   const predictedValue = predictedPerformance ? parseFloat(predictedPerformance) : 0;
   const actualValue = actualPerformance ? parseFloat(actualPerformance) : 0;
   const errorValue = predictedValue - actualValue;
+  const formattedErrorValue = errorValue.toFixed(2);
+
 
   let datasets = {};
   try {
@@ -102,7 +104,7 @@ function ActualPerformanceContent() {
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: { 
+      legend: {
         display: showAllResults,
         position: "top",
         labels: {
@@ -135,9 +137,9 @@ function ActualPerformanceContent() {
     datasets: [
       ...(showAllResults
         ? [
-            { type: "bar", label: "Non-overlapping Data", data: histogramBins, backgroundColor: "rgba(50, 205, 50, 0.6)" }, // GREEN (was red)
-            { type: "bar", label: "Overlapping Data", data: allTrueHistogramBins, backgroundColor: "rgba(255, 76, 76, 0.6)" }, // RED (was green)
-          ]
+          { type: "bar", label: "Non-overlapping Data", data: histogramBins, backgroundColor: "rgba(50, 205, 50, 0.6)" }, // GREEN (was red)
+          { type: "bar", label: "Overlapping Data", data: allTrueHistogramBins, backgroundColor: "rgba(255, 76, 76, 0.6)" }, // RED (was green)
+        ]
         : []),
       { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#007FFF", borderWidth: 3 },
       { type: "line", label: "Difference", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "#8A2BE2", borderWidth: 3 },
@@ -151,10 +153,12 @@ function ActualPerformanceContent() {
       </Typography>
 
       <Box sx={{ display: "flex", justifyContent: "center", gap: 6, mb: 3 }}>
-        <Box sx={{ padding: "20px", background: "#8A2BE2", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
-          <Typography variant="h6" sx={{ mb: 1, color: "white" }}>Difference</Typography>
-          <Typography variant="h5" sx={{ color: "white" }}>{errorValue ? `${errorValue}%` : "N/A"}</Typography>
-        </Box>
+        <MuiTooltip title={`Your Guess: ${predictedPerformance}% minus Actual Model Performance: ${actualPerformance}%`}>
+          <Box sx={{ padding: "20px", background: "#8A2BE2", borderRadius: "10px", fontSize: "24px", minWidth: "250px", cursor: "pointer" }}>
+            <Typography variant="h6" sx={{ mb: 1, color: "white" }}>Difference</Typography>
+            <Typography variant="h5" sx={{ color: "white" }}>{errorValue ? `${formattedErrorValue}%` : "N/A"}</Typography>
+          </Box>
+        </MuiTooltip>
 
         <Box sx={{ padding: "20px", background: "#007FFF", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
           <Typography variant="h6" sx={{ mb: 1, color: "white" }}>Actual Model Performance</Typography>
