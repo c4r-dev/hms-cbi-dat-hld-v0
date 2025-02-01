@@ -22,7 +22,7 @@ function ActualPerformanceContent() {
 
   const predictedValue = predictedPerformance ? parseFloat(predictedPerformance) : 0;
   const actualValue = actualPerformance ? parseFloat(actualPerformance) : 0;
-  const errorValue = predictedValue - actualValue;
+  const errorValue = (predictedValue - actualValue) || 0;
   const formattedErrorValue = errorValue.toFixed(2);
 
 
@@ -103,9 +103,10 @@ function ActualPerformanceContent() {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: showAllResults,
+        display: true,
         position: "top",
         labels: {
           font: { size: 14 },
@@ -127,7 +128,9 @@ function ActualPerformanceContent() {
       y: {
         display: true,
         beginAtZero: true,
-        ticks: { display: false }, // **Removes Y-axis numbers**
+        min: 0,
+        max: Math.max(...histogramBins, ...allTrueHistogramBins, 10) * 0.67,  // Reduce max height by 33%
+        ticks: { display: false }, // Show Y-axis values
       },
     },
   };
@@ -142,7 +145,9 @@ function ActualPerformanceContent() {
         ]
         : []),
       { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#007FFF", borderWidth: 3 },
-      { type: "line", label: "Difference", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "#8A2BE2", borderWidth: 3 },
+      // { type: "line", label: "Difference", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "#8A2BE2", borderWidth: 3 },
+      { type: "line", label: "Difference", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, ...allTrueHistogramBins, 10) }], borderColor: "#8A2BE2", borderWidth: 3 },
+
     ],
   };
 
@@ -160,10 +165,17 @@ function ActualPerformanceContent() {
           </Box>
         </MuiTooltip>
 
-        <Box sx={{ padding: "20px", background: "#007FFF", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
+        {/* <Box sx={{ padding: "20px", background: "#007FFF", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
+          <Typography variant="h6" sx={{ mb: 1, color: "white" }}>Actual Model Performance</Typography>
+          <Typography variant="h5" sx={{ color: "white" }}>{actualPerformance ? `${actualPerformance}%` : "N/A"}</Typography>
+        </Box> */}
+
+        <Box sx={{ display: "none" }}>
           <Typography variant="h6" sx={{ mb: 1, color: "white" }}>Actual Model Performance</Typography>
           <Typography variant="h5" sx={{ color: "white" }}>{actualPerformance ? `${actualPerformance}%` : "N/A"}</Typography>
         </Box>
+
+
       </Box>
 
       <Box sx={{ mb: 3 }}>
@@ -173,7 +185,8 @@ function ActualPerformanceContent() {
         />
       </Box>
 
-      <Box sx={{ width: "80%", maxWidth: "700px", mx: "auto", mt: 4 }}>
+      {/* <Box sx={{ width: "100%", maxWidth: "900px", height: "500px", mx: "auto", mt: 4 }}> */}
+      <Box sx={{ width: "100%", maxWidth: "900px", height: "335px", mx: "auto", mt: 4 }}>
         <Typography variant="h6" gutterBottom>
           Performance Error Distribution
         </Typography>

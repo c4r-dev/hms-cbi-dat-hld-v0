@@ -153,7 +153,7 @@ function ActualPerformanceContent() {
 
   return (
     <Box sx={{ p: 4, textAlign: "center", mt: 12 }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom sx={{ display: "none" }}>
         Performance Comparison
       </Typography>
 
