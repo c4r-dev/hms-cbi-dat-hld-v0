@@ -84,20 +84,20 @@ function ActualPerformanceContent() {
   const allTrueHistogramBins = new Array(27).fill(0);
 
   filteredUserErrors.forEach((err) => {
-    const binIndex = Math.floor((err.error_in_accuracy + 40) / binWidth);
+    const binIndex = Math.floor((err.error_in_accuracy + 35) / binWidth);
     if (binIndex >= 0 && binIndex < histogramBins.length) {
       histogramBins[binIndex]++;
     }
   });
 
   allTrueFilteredErrors.forEach((err) => {
-    const binIndex = Math.floor((err.error_in_accuracy + 40) / binWidth);
+    const binIndex = Math.floor((err.error_in_accuracy + 35) / binWidth);
     if (binIndex >= 0 && binIndex < allTrueHistogramBins.length) {
       allTrueHistogramBins[binIndex]++;
     }
   });
 
-  const histogramLabels = Array.from({ length: histogramBins.length }, (_, i) => -40 + i * binWidth);
+  const histogramLabels = Array.from({ length: histogramBins.length }, (_, i) => -35 + i * binWidth);
 
   const chartOptions = {
     responsive: true,
@@ -116,15 +116,16 @@ function ActualPerformanceContent() {
       x: {
         type: "linear",
         position: "bottom",
-        min: -40,
-        max: 40,
+        min: -35,
+        max: 35,
         beginAtZero: false,
         ticks: { stepSize: 5 },
-        title: { display: true, text: "Calculate the Error in Accuracy Estimation" },
+        title: { display: true, text: "Difference between Your Guess and Actual Model Performance" },
       },
       y: {
         display: true,
         beginAtZero: true,
+        ticks: { display: false }, // **Removes Y-axis numbers**
       },
     },
   };
@@ -134,8 +135,8 @@ function ActualPerformanceContent() {
     datasets: [
       ...(showAllResults
         ? [
-            { type: "bar", label: "Non-overlapping Data", data: histogramBins, backgroundColor: "rgba(255, 76, 76, 0.6)" }, // RED with transparency
-            { type: "bar", label: "Overlapping Data", data: allTrueHistogramBins, backgroundColor: "rgba(50, 205, 50, 0.6)" }, // GREEN with transparency
+            { type: "bar", label: "Non-overlapping Data", data: histogramBins, backgroundColor: "rgba(50, 205, 50, 0.6)" }, // GREEN (was red)
+            { type: "bar", label: "Overlapping Data", data: allTrueHistogramBins, backgroundColor: "rgba(255, 76, 76, 0.6)" }, // RED (was green)
           ]
         : []),
       { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#007FFF", borderWidth: 3 },
@@ -163,11 +164,7 @@ function ActualPerformanceContent() {
 
       <Box sx={{ mb: 3 }}>
         <FormControlLabel
-          control={<Switch checked={showAllResults} onChange={() => setShowAllResults((prev) => !prev)} sx={{
-            "& .MuiSwitch-thumb": { backgroundColor: "#8A2BE2" },
-            "& .Mui-checked": { color: "#8A2BE2" },
-            "& .Mui-checked + .MuiSwitch-track": { backgroundColor: "#8A2BE2" },
-          }} />}
+          control={<Switch checked={showAllResults} onChange={() => setShowAllResults((prev) => !prev)} />}
           label={<Typography variant="h6">Show Results From All Users</Typography>}
         />
       </Box>

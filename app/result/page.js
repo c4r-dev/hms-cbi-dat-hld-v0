@@ -10,7 +10,7 @@ function ResultContent() {
   const router = useRouter();
 
   const [testPerformance, setTestPerformance] = useState(null);
-  const [predictedPerformance, setPredictedPerformance] = useState(50);
+  const [predictedPerformance, setPredictedPerformance] = useState(null); // Start as null
   const [outOfSamplePerformance, setOutOfSamplePerformance] = useState(null);
 
   useEffect(() => {
@@ -38,11 +38,14 @@ function ResultContent() {
         );
 
         if (matchedObject?.test_performance !== undefined) {
-          setTestPerformance((matchedObject.test_performance * 100).toFixed(2) + "%");
+          const testPerf = (matchedObject.test_performance * 100).toFixed(2);
+          setTestPerformance(`${testPerf}%`);
           setOutOfSamplePerformance((matchedObject.out_of_sample_performance * 100).toFixed(2));
+          setPredictedPerformance(parseFloat(testPerf)); // Set slider default to test_performance
         } else {
           setTestPerformance("No results found");
           setOutOfSamplePerformance(null);
+          setPredictedPerformance(50); // Fallback default if no data is found
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -84,7 +87,7 @@ function ResultContent() {
           Predict how well the model will perform on new data
         </Typography>
         <Slider
-          value={predictedPerformance}
+          value={predictedPerformance !== null ? predictedPerformance : 50} // Use test_performance if available
           onChange={(event, newValue) => setPredictedPerformance(newValue)}
           min={0}
           max={100}
@@ -96,7 +99,7 @@ function ResultContent() {
           sx={{ color: "#9932cc" }}
         />
         <Typography sx={{ mt: 2, fontSize: "18px" }}>
-          Your Prediction: <b>{predictedPerformance}%</b>
+          Your Prediction: <b>{predictedPerformance !== null ? predictedPerformance : 50}%</b>
         </Typography>
       </Box>
 
