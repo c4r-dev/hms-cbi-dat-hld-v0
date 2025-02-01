@@ -140,7 +140,7 @@ function ActualPerformanceContent() {
           ]
         : []),
       { type: "line", label: "Actual Model Performance", data: [{ x: 0, y: 0 }, { x: 0, y: Math.max(...histogramBins, 1) }], borderColor: "#007FFF", borderWidth: 3 },
-      { type: "line", label: "Your Guess", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "#8A2BE2", borderWidth: 3 },
+      { type: "line", label: "Difference", data: [{ x: errorValue, y: 0 }, { x: errorValue, y: Math.max(...histogramBins, 1) }], borderColor: "#8A2BE2", borderWidth: 3 },
     ],
   };
 
