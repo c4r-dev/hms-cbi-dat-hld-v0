@@ -152,8 +152,8 @@ function ActualPerformanceContent() {
 
       <Box sx={{ display: "flex", justifyContent: "center", gap: 6, mb: 3 }}>
         <Box sx={{ padding: "20px", background: "#8A2BE2", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
-          <Typography variant="h6" sx={{ mb: 1, color: "white" }}>Your Guess</Typography>
-          <Typography variant="h5" sx={{ color: "white" }}>{predictedPerformance ? `${predictedPerformance}%` : "N/A"}</Typography>
+          <Typography variant="h6" sx={{ mb: 1, color: "white" }}>Difference</Typography>
+          <Typography variant="h5" sx={{ color: "white" }}>{errorValue ? `${errorValue}%` : "N/A"}</Typography>
         </Box>
 
         <Box sx={{ padding: "20px", background: "#007FFF", borderRadius: "10px", fontSize: "24px", minWidth: "250px" }}>
