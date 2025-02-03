@@ -1,13 +1,10 @@
 "use client";
 
 export default function FaviconButton() {
-  const handleClick = () => {
-    window.location.href = "/";
-  };
-
   return (
-    <button onClick={handleClick} className="favicon-button">
+    <a href="/" className="favicon-link">
       <img src="/favicon.ico" alt="Favicon" className="favicon" />
-    </button>
+    </a>
   );
 }
+

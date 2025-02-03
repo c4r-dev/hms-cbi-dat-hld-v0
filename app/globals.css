@@ -61,20 +61,22 @@ body {
 }
 
 .favicon-button {
-  background: none !important; /* Ensures no background */
-  border: none !important; /* Removes borders */
+  background: none !important;
+  border: none !important;
   padding: 0 !important;
   box-shadow: none !important;
-  align-items: center;
-  justify-content: center;
+  display: flex; /* Ensures flex behavior */
+  align-items: center; /* Vertically centers */
+  justify-content: center; /* Horizontally centers */
+  height: 100%; /* Ensures button takes full height */
 }
-
 
 .favicon {
   width: 40px;
   height: 40px;
   margin-right: 10px;
   transform: rotate(90deg);
+  display: block; /* Ensures it follows layout properly */
 }
 
 .title-container {
