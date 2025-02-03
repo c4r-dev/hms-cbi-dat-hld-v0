@@ -31,7 +31,7 @@
 body {
   font-family: 'General Sans', Courier, sans-serif;
   margin: 0;
-  padding: 0;
+  padding: 20px;
   box-sizing: border-box;
   color: #333;
   min-height: 100vh;
@@ -39,6 +39,8 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: #f9f9f9; /* Match the old application's background */
+  line-height: 1.6; /* Improves readability */
 }
 
 /* Header styling - Positioned at the top-left */
@@ -54,14 +56,19 @@ body {
   background-color: white; /* Add background to match */
   z-index: 1000;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+  padding-bottom: 10px;
+  height: 60px; /* Adjust height if needed */
 }
 
 .favicon-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
+  background: none !important; /* Ensures no background */
+  border: none !important; /* Removes borders */
+  padding: 0 !important;
+  box-shadow: none !important;
+  align-items: center;
+  justify-content: center;
 }
+
 
 .favicon {
   width: 40px;
@@ -75,16 +82,42 @@ body {
   max-width: 80%;
 }
 
-.title {
+h1, .title {
   font-size: 1.5rem;
   font-weight: bold;
   text-align: left;
+  margin-bottom: 10px;
+}
+
+h2, .centeredTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 80px; /* Adjusted for fixed header */
+  padding: 0 10%;
+  text-align: center;
 }
 
 /* Styling for the checkbox labels */
 label {
   cursor: pointer;
   font-weight: 500;
+  font-size: 1rem;
+}
+
+/* ===== SLIDER LABELS ===== */
+.sliderLabel {
+  display: block;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+/* Min/Max Text for Sliders */
+.sliderMin, .sliderMax {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  width: 30px;
+  text-align: center;
 }
 
 /* Flat Rectangular Cylinder Styling */
@@ -167,7 +200,7 @@ label {
 }
 
 /* Improved Run Model Button Spacing */
-.run-model-button {
+button, .run-model-button {
   background-color: #9932cc !important;
   color: white !important;
   font-size: 16px;

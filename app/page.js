@@ -44,9 +44,10 @@ export default function Home() {
 
   return (
     <Box sx={{ p: 4, textAlign: "center", mt: 12 }}>
-      <Typography variant="h4" gutterBottom sx={{ textWrap: "balance" }}>
+      <Typography className="centeredTitle">
         Select subsets of the data to be used for training and testing the model
       </Typography>
+
 
       <Box
         sx={{
