@@ -1,6 +1,5 @@
-import Link from "next/link";
-import ThemeRegistry from "./ThemeRegistry";
 import "./globals.css";
+import FaviconButton from "./components/FaviconButton";
 
 export const metadata = {
   title: "Data Selection App",
@@ -14,23 +13,22 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body>
-        <ThemeRegistry>
-          {/* Header */}
-          <header className="header">
-            {/* 📌 Wrapped favicon inside Link */}
-            <Link href="/">
-              <img src="/favicon.ico" alt="Favicon" className="favicon" style={{ cursor: "pointer" }} />
-            </Link>
-            
+        {/* Header */}
+        <header className="header">
+          {/* Using FaviconButton Client Component */}
+          <FaviconButton />
+
+          {/* Title container for responsive width */}
+          <div className="title-container">
             <h1 className="title">
               We’ve got this model - we think it performs great. <br />
               Here's how we selected the training and testing data for it.
             </h1>
-          </header>
+          </div>
+        </header>
 
-          {/* Main Content */}
-          {children}
-        </ThemeRegistry>
+        {/* Main Content */}
+        {children}
       </body>
     </html>
   );
