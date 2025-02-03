@@ -9,6 +9,9 @@ const theme = createTheme({
     primary: { main: "#1976d2" },
     secondary: { main: "#dc004e" },
   },
+  typography: {
+    fontFamily: "'General Sans', Courier, sans-serif",
+  },
 });
 
 export default function ThemeRegistry({ children }) {
