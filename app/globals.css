@@ -1,3 +1,27 @@
+@font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/GeneralSans/GeneralSans-Regular.woff2') format('woff2'),
+       url('/fonts/GeneralSans/GeneralSans-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/GeneralSans/GeneralSans-Bold.woff2') format('woff2'),
+       url('/fonts/GeneralSans/GeneralSans-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/GeneralSans/GeneralSans-Italic.woff2') format('woff2'),
+       url('/fonts/GeneralSans/GeneralSans-Italic.woff') format('woff');
+  font-weight: normal;
+  font-style: italic;
+}
+
 /* Apply text-wrap: balance to all elements */
 * {
   text-wrap: balance;
@@ -5,7 +29,7 @@
 
 /* Apply General Sans as the default font */
 body {
-  font-family: 'GeneralSans', sans-serif;
+  font-family: 'General Sans', sans-serif;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
